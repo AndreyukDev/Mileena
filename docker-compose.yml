@@ -1,0 +1,9 @@
+services:
+  app:
+    build: .
+    ports:
+      - "80:80"
+    volumes:
+      - .:/var/www/html
+    environment:
+      - DATABASE_URL=mysql://user:pass@db:3306/mileena_db

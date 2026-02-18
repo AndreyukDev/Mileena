@@ -1,0 +1,40 @@
+{
+  "name": "andreyukdev/mileena",
+  "description": "Mileena, lightweight business PHP Framework",
+  "type": "library",
+  "config": {
+    "platform": {
+      "php": "8.4"
+    }
+  },
+  "require": {
+    "php": ">=8.4"
+  },
+  "autoload": {
+    "psr-4": {
+      "Mileena\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Mileena\\public\\": "public/"
+    }
+  },
+  "authors": [
+    {
+      "name": "Artem Andreyuk"
+    }
+  ],
+  "require": {
+    "vlucas/phpdotenv": "^5.6"
+  },
+  "require-dev": {
+    "phpstan/phpstan": "^2.1",
+    "friendsofphp/php-cs-fixer": "^3.94"
+  },
+  "scripts": {
+    "lint": "vendor/bin/phpstan analyze --configuration=phpstan.neon",
+    "fix": "php-cs-fixer fix --config=.php-cs-fixer.dist.php",
+    "test": "phpunit"
+  }
+}

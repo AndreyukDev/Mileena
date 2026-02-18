@@ -1,0 +1,26 @@
+name: Code Quality
+
+on: [ push, pull_request ]
+
+jobs:
+  php-analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, xml, ctype, iconv, mysql
+          tools: phpstan, php-cs-fixer
+
+      - name: Install Dependencies
+        run: composer install --no-progress --prefer-dist
+
+      - name: Run PHP CS Fixer (Style Check)
+        run: vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php --dry-run --diff
+
+      - name: Run PHPStan (Static Analysis)
+        run: vendor/bin/phpstan analyze --configuration=phpstan.neon
