@@ -86,11 +86,19 @@ abstract class Crud extends DBM
     /**
      * Retrieves a single record by its primary key and maps it to a DTO.
      *
-     * @param int|string $pkId The primary key value.
-     * @return T|null The DTO object or null if not found.
+     * @param int|string|null $pkId The primary key value.
+     * @return T|array|null The DTO object or null if not found.
      */
-    public static function getById(int|string $pkId): ?object
+    public static function getById(int|string|null $pkId): array|object|null
     {
+        if ($pkId === null) {
+            if (static::getDtoClass()) {
+                return null;
+            }
+
+            return [];
+        }
+
         return self::makeOne(
             "SELECT * FROM " . static::getTableName() . " WHERE id = ?",
             [$pkId],
