@@ -203,6 +203,30 @@ class Params
         return isset($this->source[$name]);
     }
 
+    /**
+     * Checks if a form parameter matches the given value.
+     * * Returns false if:
+     * - The comparison value ($v) is empty or null.
+     * - The form parameter does not exist or is empty.
+     * * Returns true only if the parameter value strictly matches $v.
+     *
+     * @param string $name The name of the input field.
+     * @param mixed  $v    The value to compare against.
+     * @return bool
+     */
+    public function eq(string $name, mixed $v): bool
+    {
+        if ($v === '' || $v === null) {
+            return false;
+        }
+
+        if (!isset($this->source[$name]) || $this->source[$name] === '') {
+            return false;
+        }
+
+        return $this->source[$name] == $v;
+    }
+
     public function isAjax(): bool
     {
         return (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest');
