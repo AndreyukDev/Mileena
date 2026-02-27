@@ -133,11 +133,9 @@ abstract class DBM
 
         $finalParams = [];
 
-        // Если есть параметры, проверяем их на наличие массивов
         if (!empty($params)) {
             foreach ($params as $val) {
                 if (is_array($val)) {
-                    // Если массив пустой, SQL упадет на IN (), поэтому ставим NULL или обрабатываем
                     if (empty($val)) {
                         $placeholders = 'NULL';
                     } else {
@@ -145,7 +143,6 @@ abstract class DBM
                         $finalParams = array_merge($finalParams, array_values($val));
                     }
 
-                    // Заменяем ПЕРВЫЙ встречный '?' на сгенерированные плейсхолдеры
                     $pos = strpos($q, '?');
 
                     if ($pos !== false) {
@@ -173,7 +170,6 @@ abstract class DBM
             throw new \Exception("Prepare failed: " . $con->error);
         }
 
-        // 2. Явная привязка параметров с контролем типов
         if (!empty($finalParams)) {
             $types = "";
 
@@ -183,7 +179,7 @@ abstract class DBM
                 } elseif (is_double($param)) {
                     $types .= "d";
                 } else {
-                    $types .= "s"; // Все остальное, включая '3.2', улетит как string
+                    $types .= "s";
                 }
             }
             $stmt->bind_param($types, ...$finalParams);
@@ -200,7 +196,6 @@ abstract class DBM
     public static function getConnection(): mysqli
     {
         if (self::$connection === null) {
-            // Enable exception mode for mysqli for better error handling
             mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
             $app = WebApp::getInstance();
@@ -208,11 +203,8 @@ abstract class DBM
 
             try {
                 self::$connection = new mysqli($dbHost, $dbUser, $dbPass, $dbName, $dbPort);
-                // Use set_charset for modern compatibility
                 self::$connection->set_charset('utf8mb4');
             } catch (\mysqli_sql_exception $e) {
-                // It's good practice to log the error and re-throw a more generic exception
-                // error_log('Database connection failed: ' . $e->getMessage());
                 throw new \RuntimeException('Could not connect to the database.', 0, $e);
             }
         }

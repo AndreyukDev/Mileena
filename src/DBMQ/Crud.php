@@ -48,7 +48,6 @@ abstract class Crud extends DBM
             $data = $data->toArray();
         }
 
-        // handling special data types
         foreach ($data as $k => $v) {
             if ($v instanceof \DateTimeInterface) {
                 $data[$k] = $v->format('Y-m-d H:i:s');
@@ -64,12 +63,11 @@ abstract class Crud extends DBM
             $stmt = $con->prepare("INSERT INTO `{$table}` SET {$setClause}");
         } else {
             $stmt = $con->prepare("UPDATE `{$table}` SET {$setClause} WHERE `{$key}` = ?");
-            $bindTypes .= 's'; // Assuming PK is a string or int, 's' works for both.
+            $bindTypes .= 's';
             $values[] = $pkId;
         }
 
         if (!$stmt) {
-            // In a real application, this should throw an exception or be logged.
             return 0;
         }
 
@@ -271,8 +269,6 @@ abstract class Crud extends DBM
             $con->commit();
         } catch (\Throwable $e) {
             $con->rollback();
-            // In a real application, this should be logged.
-            // error_log('SaveSort failed: ' . $e->getMessage());
         }
     }
 }
