@@ -55,6 +55,7 @@ class WebApp
             $controller = new $controllerPath();
 
             if (method_exists($controller, $this->controllerMethod)) {
+                $refClass = new \ReflectionClass($controller);
                 $refMethod = new \ReflectionMethod($controller, $this->controllerMethod);
 
                 if (!$refMethod->isPublic()) {
@@ -63,7 +64,7 @@ class WebApp
                     return;
                 }
 
-                $isAllowPublicAccess = $controller instanceof AllowPublicAccess;
+                $isAllowPublicAccess = !empty($refClass->getAttributes(AllowPublicAccess::class));
                 $isAllowPublicMethod = !empty($refMethod->getAttributes(AllowPublicAccess::class));
 
                 if (!$isAllowPublicAccess && !$isAllowPublicMethod) {

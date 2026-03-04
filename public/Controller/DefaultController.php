@@ -7,7 +7,8 @@ namespace Mileena\Public\Controller;
 use Mileena\Public\App;
 use Mileena\Web\AllowPublicAccess;
 
-class DefaultController implements AllowPublicAccess
+#[AllowPublicAccess]
+class DefaultController
 {
     public function index(): void
     {
