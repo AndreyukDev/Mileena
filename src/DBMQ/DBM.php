@@ -9,6 +9,8 @@ use mysqli;
 
 /**
  * Abstract class providing database connection and basic query execution methods.
+ *
+ * @template T of object
  */
 abstract class DBM
 {
