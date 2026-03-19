@@ -1,28 +1,10 @@
 parameters:
 	ignoreErrors:
 		-
-			message: '#^Call to an undefined static method Mileena\\DBMQ\\T\:\:fromArray\(\)\.$#'
+			message: '#^Call to an undefined static method object\:\:fromArray\(\)\.$#'
 			identifier: staticMethod.notFound
 			count: 1
 			path: src/DBMQ/Crud.php
-
-		-
-			message: '#^Method Mileena\\DBMQ\\DBM\:\:getDtoClass\(\) has invalid return type Mileena\\DBMQ\\T\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/DBMQ/DBM.php
-
-		-
-			message: '#^Method Mileena\\DBMQ\\DBM\:\:makeList\(\) has invalid return type Mileena\\DBMQ\\T\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/DBMQ/DBM.php
-
-		-
-			message: '#^Method Mileena\\DBMQ\\DBM\:\:makeOne\(\) has invalid return type Mileena\\DBMQ\\T\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/DBMQ/DBM.php
 
 		-
 			message: '#^Variable \$user in empty\(\) always exists and is not falsy\.$#'

@@ -78,11 +78,14 @@ abstract class Auth
         }
         // Regenerate the session ID to prevent session fixation attacks.
         session_regenerate_id(true);
+        $_SESSION = [];
 
-        $_SESSION['auth']['user_id'] = $user['id'];
-        $_SESSION['auth']['username'] = $user['username'];
-        $_SESSION['auth']['debug'] = $user['debug'];
-        $_SESSION['auth']['allow'] = $user['allow'];
+        $_SESSION['auth'] = [
+            'user_id' => (int) $user['id'],
+            'username' => (string) $user['username'],
+            'debug' => (bool) ($user['debug'] ?? false),
+            'allow' => (array) ($user['allow'] ?? []),
+        ];
 
         return true;
     }
