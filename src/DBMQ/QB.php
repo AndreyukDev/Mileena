@@ -92,7 +92,7 @@ class QB
 
     public function in(string $f, array|float|int|string|null $v, string $e = "'", string $not = ''): self
     {
-        if (!$f) {
+        if (!$f || $v === null) {
             return $this;
         }
 
@@ -103,6 +103,8 @@ class QB
             $sql = $f . " $not in (" . $e . implode("$e,$e", $escapedValues) . "$e)";
         } elseif (is_string($v) && $v !== '') {
             $sql = $f . " $not in ($e" . self::_e($v) . "$e)";
+        } elseif (is_int($v) || is_float($v)) {
+            $sql = $f . " $not in (" . $v . ")";
         }
 
         if ($sql) {

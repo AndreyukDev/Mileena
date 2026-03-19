@@ -13,7 +13,6 @@ trait LegacyArrayAccess
 
     public function offsetGet(mixed $offset): mixed
     {
-        // Позволяет обращаться как $this->{'active'}
         return $this->$offset;
     }
 
@@ -27,7 +26,6 @@ trait LegacyArrayAccess
     public function offsetUnset(mixed $offset): void
     {
         if (property_exists($this, $offset)) {
-            // Для мутабельных DTO часто лучше занулять, чем ассеттить
             $this->$offset = null;
         }
     }
