@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mileena\DBMQ;
 
+use Mileena\Web\WebApp;
+
 /**
  * Abstract class for simple CRUD database operations.
  * It uses a Data Transfer Object (DTO) for type-safe data handling.
@@ -72,7 +74,17 @@ abstract class Crud extends DBM
         }
 
         $stmt->bind_param($bindTypes, ...$values);
-        $stmt->execute();
+        $app = WebApp::getInstance();
+
+        try {
+            $stmt->execute();
+        } catch (\mysqli_sql_exception $e) {
+            if ($e->getCode() == 1062 && $app->config->get('ignore_duplicates')) {
+                return 0;
+            }
+
+            throw $e;
+        }
 
         if ($pkId === null || $pkId === 0 || $pkId === '') {
             return $con->insert_id;

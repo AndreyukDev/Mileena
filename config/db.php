@@ -10,4 +10,5 @@ return [
     'name'     => $_ENV['DB_NAME'] ?? 'mileena_db',
     'port'     => (int) ($_ENV['DB_PORT'] ?? 3306),
     'charset'  => 'utf8mb4',
+    'ignore_duplicates' => filter_var($_ENV['DB_IGNORE_DUPLICATES'] ?? false, FILTER_VALIDATE_BOOLEAN),
 ];
