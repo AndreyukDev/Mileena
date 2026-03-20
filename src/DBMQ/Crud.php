@@ -79,7 +79,7 @@ abstract class Crud extends DBM
         try {
             $stmt->execute();
         } catch (\mysqli_sql_exception $e) {
-            if ($e->getCode() == 1062 && $app->config->get('ignore_duplicates')) {
+            if ($e->getCode() == 1062 && $app->config->get('db.ignore_duplicates')) {
                 return 0;
             }
 
