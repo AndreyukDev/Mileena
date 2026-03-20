@@ -10,6 +10,7 @@ return [
     'charset'   => 'UTF-8',
     'default_controller' => 'default',
     'default_controller_method' => 'index',
+    'default_login_page' => '/default/login',
     'controller_namespace' => 'Mileena\\Public\\Controller\\',
     'controllers' => [
         'default' => 'Default',

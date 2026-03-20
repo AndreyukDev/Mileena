@@ -19,9 +19,10 @@ abstract class Auth
     public static function protect(): void
     {
         if (!self::isLoggedIn()) {
+            $app = WebApp::getInstance();
             // Redirect to the login page.
-            header('Location: /');
-            exit; // Terminate script execution after redirection.
+            header('Location: ' . $app->config->get('app.default_login_page'));
+            exit;
         }
     }
 
