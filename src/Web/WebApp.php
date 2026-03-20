@@ -113,4 +113,14 @@ class WebApp
     {
         return self::$argList;
     }
+
+    public function getController(): string
+    {
+        return $this->controller;
+    }
+
+    public function getControllerMethod(): string
+    {
+        return $this->controllerMethod;
+    }
 }
