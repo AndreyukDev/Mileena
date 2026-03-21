@@ -69,12 +69,12 @@ abstract class Auth
     /**
      * Establishes a user session upon successful login.
      *
-     * @param array{id: int, username: string, debug: false, allow: array} $user An associative array containing user data.
+     * @param array{id: int, username: string, debug?: false, allow?: array}|array{} $user An associative array containing user data.
      * @return bool Always returns true on success.
      */
     public static function login(array $user): bool
     {
-        if (empty($user)) {
+        if ($user === []) {
             return false;
         }
         // Regenerate the session ID to prevent session fixation attacks.

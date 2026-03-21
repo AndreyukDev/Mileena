@@ -77,7 +77,7 @@ class Params
             ? ($this->source[$name][$second] ?? '')
             : ($this->source[$name] ?? '');
 
-        return ($val === '' || $val === null) ? null : (int) $val;
+        return $val === '' ? null : (int) $val;
     }
 
     /**
