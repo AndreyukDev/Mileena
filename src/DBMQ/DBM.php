@@ -10,7 +10,7 @@ use mysqli;
 /**
  * Abstract class providing database connection and basic query execution methods.
  *
- * @template T of object
+ * @template T of DTO
  */
 abstract class DBM
 {
@@ -95,7 +95,7 @@ abstract class DBM
      * @param string|\Mileena\DBMQ\QB $q The raw SQL query string or QB object.
      * @return T|array|null The record data or null if not found.
      */
-    protected static function makeOne(QB|string $q, array $params = [], ?string $dtoClass = null): mixed
+    protected static function makeOne(QB|string $q, array $params = [], ?string $dtoClass = null): array|object|null
     {
         $queryStr = $q instanceof QB ? $q->getQuery() : $q;
         $result = self::query($queryStr, $params);
@@ -247,6 +247,8 @@ abstract class DBM
      *
      * @param string|\Mileena\DBMQ\QB $q The raw SQL query string or QB object.
      * @param string|null $key The column to use as the array key.
+     * @param array $params
+     * @param string|null $dtoClass
      * @return array<int|string, T|array<string, mixed>>
      */
     protected static function makeList(
@@ -290,9 +292,11 @@ abstract class DBM
      * @param string|QB $q The raw SQL query string or QB object.
      * @param string $key The first level key.
      * @param string|null $key2 The second level key.
+     * @param array $params
+     * @param string|null $dtoClass
      * @return array<string, mixed>
      */
-    protected static function makeDoubleList(QB|string $q, string $key, ?string $key2 = null, array $params = []): array
+    protected static function makeDoubleList(QB|string $q, string $key, ?string $key2 = null, array $params = [], ?string $dtoClass = null): array
     {
         $list = [];
         $queryStr = $q instanceof QB ? $q->getQuery() : $q;
@@ -300,10 +304,21 @@ abstract class DBM
 
         if ($result instanceof \mysqli_result) {
             while ($row = $result->fetch_assoc()) {
+                $keyVal = $row[$key];
+
                 if ($key2) {
-                    $list[$row[$key]][$row[$key2]] = $row;
+                    $keyVal2 = $row[$key2];
+
+                    if ($dtoClass) {
+                        $row = $dtoClass::fromArray($row);
+                    }
+
+                    $list[$keyVal][$keyVal2] = $row;
                 } else {
-                    $list[$row[$key]][] = $row;
+                    if ($dtoClass) {
+                        $row = $dtoClass::fromArray($row);
+                    }
+                    $list[$keyVal][] = $row;
                 }
             }
             $result->free();
@@ -319,6 +334,7 @@ abstract class DBM
      * @param string|\Mileena\DBMQ\QB $q The raw SQL query string or QB object.
      * @param string $key The column to use as the map key.
      * @param string $value The column to use as the map value.
+     * @param array $params
      * @return array<string, mixed>
      */
     protected static function makeMap(QB|string $q, string $key, string $value, array $params = []): array
@@ -345,6 +361,7 @@ abstract class DBM
      * @param string $key The first level key.
      * @param string $key2 The second level key.
      * @param string $value The value column.
+     * @param array $params
      * @return array<string, mixed>
      */
     protected static function makeDoubleMap(

@@ -11,6 +11,8 @@ use Mileena\Web\WebApp;
  * It uses a Data Transfer Object (DTO) for type-safe data handling.
  *
  * @template T of DTO
+ * @method static string getTableName()
+ * @method static string getDtoClass()
  */
 abstract class Crud extends DBM
 {
@@ -120,7 +122,7 @@ abstract class Crud extends DBM
      * Retrieves multiple records by their primary keys and maps them to DTOs.
      *
      * @param array<int|string> $pkIds An array of primary key values.
-     * @return array<int|string, T> An associative array of DTOs, keyed by their primary key.
+     * @return array<int|string, T|array<string, mixed>> An associative array of DTOs, keyed by their primary key.
      */
     public static function getByIds(array $pkIds): array
     {
@@ -169,7 +171,7 @@ abstract class Crud extends DBM
      *
      * @param string|null $key The column to use as the key for the result array.
      * @param string $orderBy The ORDER BY clause. WARNING: Not sanitized, do not use with user input.
-     * @return array<int|string, T>
+     * @return array<int|string, T|array<string, mixed>>
      */
     public static function getList(?string $key = null, string $orderBy = 'id asc'): array
     {
