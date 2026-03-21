@@ -302,7 +302,7 @@ abstract class DBM
      * @param string|null $key2 The second level key.
      * @param array $params
      * @param string|null $dtoClass
-     * @return array<string, mixed>
+     * @return ($key2 is null ? array<string, list<T|array>> : array<string, array<string, T|array>>)
      */
     protected static function makeDoubleList(QB|string $q, string $key, ?string $key2 = null, array $params = [], ?string $dtoClass = null): array
     {
