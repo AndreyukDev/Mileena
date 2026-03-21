@@ -104,6 +104,10 @@ abstract class DBM
             $row = $result->fetch_assoc();
             $result->free();
 
+            if (!$dtoClass && static::getDtoClass()) {
+                $dtoClass = static::getDtoClass();
+            }
+
             if ($dtoClass) {
                 return $dtoClass::fromArray($row);
             }
@@ -261,6 +265,10 @@ abstract class DBM
         $queryStr = $q instanceof QB ? $q->getQuery() : $q;
         $result = self::query($queryStr, $params);
 
+        if (!$dtoClass && static::getDtoClass()) {
+            $dtoClass = static::getDtoClass();
+        }
+
         if ($result instanceof \mysqli_result) {
             while ($row = $result->fetch_assoc()) {
                 $keyVal = null;
@@ -301,6 +309,10 @@ abstract class DBM
         $list = [];
         $queryStr = $q instanceof QB ? $q->getQuery() : $q;
         $result = self::query($queryStr, $params);
+
+        if (!$dtoClass && static::getDtoClass()) {
+            $dtoClass = static::getDtoClass();
+        }
 
         if ($result instanceof \mysqli_result) {
             while ($row = $result->fetch_assoc()) {
