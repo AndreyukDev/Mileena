@@ -11,6 +11,7 @@ use Mileena\Web\WebApp;
  * It uses a Data Transfer Object (DTO) for type-safe data handling.
  *
  * @template T of DTO
+ * @extends DBM<T>
  * @method static string getTableName()
  * @method static string getDtoClass()
  */
