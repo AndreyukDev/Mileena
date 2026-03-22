@@ -74,6 +74,12 @@ trait HasToArray
             }
         }
 
-        return new static(...$params);
+        $object = new static(...$params);
+
+        $reflection = new \ReflectionClass(static::class);
+        $idProperty = $reflection->getProperty('id');
+        $idProperty->setValue($object, (int) $data['id']);
+
+        return $object;
     }
 }
