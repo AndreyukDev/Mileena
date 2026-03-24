@@ -182,6 +182,57 @@ class QBTest extends TestCase
         );
     }
 
+    public function testRemoveFileInGroup(): void
+    {
+        $this->qb->_and("parent", 25587);
+        $this->qb->_and();
+        $this->qb->startBraces();
+        $this->qb->_and('o.parent', 0);
+        $this->qb->_or('o.order_type', 9);
+        $this->qb->endBraces();
+
+        $this->qb->removeFieldFromWhere('o.order_type');
+
+        $this->assertEquals(
+            "select * from users where parent = '25587' && (o.parent = '0')",
+            $this->qb->getQuery(),
+        );
+    }
+
+    public function testRemoveFileInGroupLeft(): void
+    {
+        $this->qb->_and("parent", 25587);
+        $this->qb->_and();
+        $this->qb->startBraces();
+        $this->qb->_and('o.parent', 0);
+        $this->qb->_or('o.order_type', 9);
+        $this->qb->endBraces();
+
+        $this->qb->removeFieldFromWhere('o.parent');
+
+        $this->assertEquals(
+            "select * from users where parent = '25587' && (o.order_type = '9')",
+            $this->qb->getQuery(),
+        );
+    }
+
+    public function testRemoveFileInGroupMiddle(): void
+    {
+        $this->qb->_and("parent", 25587);
+        $this->qb->_and();
+        $this->qb->startBraces();
+        $this->qb->_and('o.parent', 0);
+        $this->qb->_and('o.status', 1);
+        $this->qb->_or('o.order_type', 9);
+        $this->qb->endBraces();
+
+        $this->qb->removeFieldFromWhere('o.status');
+        $this->assertEquals(
+            "select * from users where parent = '25587' && (o.parent = '0' || o.order_type = '9')",
+            $this->qb->getQuery(),
+        );
+    }
+
     public function testRawExpressionsAndCleanup(): void
     {
         $this->qb->raw("AND (1=1)")

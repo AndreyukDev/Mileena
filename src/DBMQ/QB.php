@@ -19,14 +19,14 @@ class QB
 
     public function startBraces(): self
     {
-        $this->whereItems[] = ['type' => 'raw', 'val' => '('];
+        $this->whereItems[] = ['type' => 'group', 'val' => '('];
 
         return $this;
     }
 
     public function endBraces(): self
     {
-        $this->whereItems[] = ['type' => 'raw', 'val' => ')'];
+        $this->whereItems[] = ['type' => 'group', 'val' => ')'];
 
         return $this;
     }
@@ -204,9 +204,19 @@ class QB
 
     public function removeFieldFromWhere(string $f): void
     {
-        $this->whereItems = array_filter($this->whereItems, function ($item) use ($f) {
-            return !($item['type'] === 'field' && $item['field'] === $f);
-        });
+        foreach ($this->whereItems as $k => $item) {
+            if ($f == $item['field'] && $item['type'] === 'field') {
+                if (isset($this->whereItems[$k - 1])) {
+                    if ($this->whereItems[$k - 1]['type'] === 'op') {
+                        unset($this->whereItems[$k - 1]);
+                    } elseif ($this->whereItems[$k - 1]['type'] === 'group') {
+                        unset($this->whereItems[$k + 1]);
+                    }
+                }
+                unset($this->whereItems[$k]);
+            }
+        }
+
         $this->whereItems = array_values($this->whereItems);
     }
 
