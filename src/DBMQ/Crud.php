@@ -53,6 +53,8 @@ abstract class Crud extends DBM
             $data = $data->toArray();
         }
 
+        $data = self::camelToSnakeKeys($data);
+
         foreach ($data as $k => $v) {
             if ($v instanceof \DateTimeInterface) {
                 $data[$k] = $v->format('Y-m-d H:i:s');
@@ -285,5 +287,23 @@ abstract class Crud extends DBM
         } catch (\Throwable $e) {
             $con->rollback();
         }
+    }
+
+    /**
+     * Converts array keys from camelCase to snake_case.
+     *
+     * @param array $data The input array with camelCase keys.
+     * @return array The output array with snake_case keys.
+     */
+    private static function camelToSnakeKeys(array $data): array
+    {
+        $result = [];
+
+        foreach ($data as $key => $value) {
+            $snakeKey = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $key));
+            $result[$snakeKey] = $value;
+        }
+
+        return $result;
     }
 }
