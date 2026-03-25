@@ -55,14 +55,6 @@ abstract class Crud extends DBM
 
         $data = self::camelToSnakeKeys($data);
 
-        foreach ($data as $k => $v) {
-            if ($v instanceof \DateTimeInterface) {
-                $data[$k] = $v->format('Y-m-d H:i:s');
-            } elseif (is_bool($v)) {
-                $data[$k] = (int) $v;
-            }
-        }
-
         [$bindTypes, $setClause] = self::makeBindUpdate($data);
         $values = array_values($data);
 

@@ -8,7 +8,24 @@ trait HasToArray
 {
     public function toArray(): array
     {
-        return get_object_vars($this);
+        return $this->convertValues(get_object_vars($this));
+    }
+
+    private function convertValues(array $data): array
+    {
+        foreach ($data as $k => $v) {
+            if ($v instanceof \DateTimeInterface) {
+                $data[$k] = $v->format('Y-m-d H:i:s');
+            } elseif (is_bool($v)) {
+                $data[$k] = (int) $v;
+            } elseif (is_array($v)) {
+                $data[$k] = json_encode($v);
+            } elseif (is_object($v) && method_exists($v, 'toArray')) {
+                $data[$k] = $v->toArray();
+            }
+        }
+
+        return $data;
     }
 
     private static function snakeToCamel(string $snake): string
