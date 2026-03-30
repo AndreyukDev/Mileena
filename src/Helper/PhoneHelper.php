@@ -20,10 +20,10 @@ final class PhoneHelper
      * - "123" → null (invalid)
      * - "+796143549349349343200" → null (too long)
      *
-     * @param string $phone Raw phone number
+     * @param string|null $phone Raw phone number
      * @return string|null Cleaned phone number in E.164 format, or null if invalid
      */
-    public static function clean(string $phone): ?string
+    public static function clean(?string $phone = null): ?string
     {
         $cleaned = preg_replace('/[^0-9+]/', '', $phone);
 
@@ -78,11 +78,15 @@ final class PhoneHelper
     /**
      * Get phone number without '+' prefix (raw format).
      *
-     * @param string $phone Raw phone number
+     * @param string|null $phone Raw phone number
      * @return string|null Phone without '+', or null if invalid
      */
-    public static function toRaw(string $phone): ?string
+    public static function toRaw(?string $phone = null): ?string
     {
+        if ($phone === null) {
+            return null;
+        }
+
         $cleaned = self::clean($phone);
 
         if ($cleaned === null) {
