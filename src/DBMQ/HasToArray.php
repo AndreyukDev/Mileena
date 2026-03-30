@@ -8,7 +8,21 @@ trait HasToArray
 {
     public function toArray(): array
     {
-        return $this->convertValues(get_object_vars($this));
+        $data = [];
+        $reflection = new \ReflectionClass($this);
+
+        foreach ($reflection->getProperties() as $prop) {
+            $name = $prop->getName();
+
+            // skip #[IgnoreField]
+            if (!empty($prop->getAttributes(IgnoreField::class))) {
+                continue;
+            }
+
+            $data[$name] = $prop->getValue($this);
+        }
+
+        return $this->convertValues($data);
     }
 
     private function convertValues(array $data): array
@@ -45,7 +59,7 @@ trait HasToArray
             $camelKey = self::snakeToCamel($key);
 
             if (isset($camelData[$camelKey])) {
-                //                error_log("Conflict: '{$key}' and previous key both map to '{$camelKey}'");
+                // error_log("Conflict: '{$key}' and previous key both map to '{$camelKey}'");
             }
 
             $camelData[$camelKey] = $value;
@@ -67,12 +81,11 @@ trait HasToArray
 
             if ($type === \DateTime::class && is_string($val) && !empty($val)) {
                 $params[$name] = new \DateTime($val);
-            } // Авто-каст для массивов (JSON из базы)
-            elseif ($type === 'array') {
+            } elseif ($type === 'array') {
                 if (is_string($val) && !empty($val)) {
                     $params[$name] = json_decode($val, true) ?: [];
                 } elseif ($val === null) {
-                    $params[$name] = [];  // 👈 null → пустой массив
+                    $params[$name] = [];
                 } else {
                     $params[$name] = (array) $val;
                 }
@@ -93,9 +106,20 @@ trait HasToArray
 
         $object = new static(...$params);
 
-        $reflection = new \ReflectionClass(static::class);
-        $idProperty = $reflection->getProperty('id');
-        $idProperty->setValue($object, (int) $data['id']);
+        if (isset($data['id'])) {
+            $reflection = new \ReflectionClass(static::class);
+            $idProperty = $reflection->getProperty('id');
+            $type = $idProperty->getType();
+
+            $value = $data['id'];
+
+            if ($type && $type->getName() === 'int') {
+                $value = (int) $value;
+            } elseif ($type && $type->getName() === 'string') {
+                $value = (string) $value;
+            }
+            $idProperty->setValue($object, $value);
+        }
 
         return $object;
     }
