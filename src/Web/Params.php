@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mileena\Web;
 
+use Mileena\Helper\PhoneHelper;
+
 /**
  * Provides a structured and type-safe way to access input parameters from sources like $_GET, $_POST, or a custom array.
  * By default, it uses $_REQUEST as the data source.
@@ -119,23 +121,14 @@ class Params
     }
 
     /**
-     * Cleans the phone number and formats it as 7XXXXXXXXXX.
-     * - Removes all non-digit characters.
-     * - Converts leading 8 to 7 for RU numbers.
-     * - Returns a string of digits without the plus sign.
-     *      *
+     * Clean phone number to E.164 format.
+     *
      * @param string $name
-     * @return string
+     * @return string|null
      */
-    public function getPhone(string $name): string
+    public function getPhone(string $name): ?string
     {
-        $clean = preg_replace('/[^0-9]/', '', $this->getStrval($name));
-
-        if (strlen($clean) === 11 && strpos($clean, '8') === 0) {
-            $clean[0] = '7';
-        }
-
-        return $clean;
+        return PhoneHelper::clean($this->getStrval($name));
     }
 
     /**

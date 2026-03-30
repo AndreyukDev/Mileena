@@ -25,6 +25,10 @@ final class PhoneHelper
      */
     public static function clean(?string $phone = null): ?string
     {
+        if ($phone === null) {
+            return null;
+        }
+
         $cleaned = preg_replace('/[^0-9+]/', '', $phone);
 
         if (empty($cleaned)) {
