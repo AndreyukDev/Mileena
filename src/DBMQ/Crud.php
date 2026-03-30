@@ -50,10 +50,18 @@ abstract class Crud extends DBM
         $con = self::getConnection();
 
         if ($data instanceof DTO) {
-            $data = $data->toArray();
+            if ($data instanceof AbstractDTO && $data->isDirty()) {
+                $data = $data->getDirtyFields();
+            } else {
+                $data = $data->toArray();
+            }
         }
 
         $data = self::camelToSnakeKeys($data);
+
+        if ($data === []) {
+            return 0;
+        }
 
         [$bindTypes, $setClause] = self::makeBindUpdate($data);
         $values = array_values($data);
