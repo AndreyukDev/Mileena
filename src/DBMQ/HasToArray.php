@@ -19,6 +19,11 @@ trait HasToArray
                 continue;
             }
 
+            // skip unInitialized and readonly properties
+            if ($prop->isReadOnly() && !$prop->isInitialized($this)) {
+                continue;
+            }
+
             $data[$name] = $prop->getValue($this);
         }
 
