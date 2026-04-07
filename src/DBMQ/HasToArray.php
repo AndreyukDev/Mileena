@@ -62,11 +62,6 @@ trait HasToArray
 
         foreach ($data as $key => $value) {
             $camelKey = self::snakeToCamel($key);
-
-            if (isset($camelData[$camelKey])) {
-                // error_log("Conflict: '{$key}' and previous key both map to '{$camelKey}'");
-            }
-
             $camelData[$camelKey] = $value;
         }
 
@@ -81,12 +76,18 @@ trait HasToArray
 
         foreach ($constructor->getParameters() as $param) {
             $name = $param->getName();
-            $type = $param->getType()?->getName();
+            $type = $param->getType();
             $val = $camelData[$name] ?? null;
 
-            if ($type === \DateTime::class && is_string($val) && !empty($val)) {
+            $typeName = null;
+
+            if ($type instanceof \ReflectionNamedType) {
+                $typeName = $type->getName();
+            }
+
+            if ($typeName === \DateTime::class && is_string($val) && !empty($val)) {
                 $params[$name] = new \DateTime($val);
-            } elseif ($type === 'array') {
+            } elseif ($typeName === 'array') {
                 if (is_string($val) && !empty($val)) {
                     $params[$name] = json_decode($val, true) ?: [];
                 } elseif ($val === null) {
@@ -94,15 +95,13 @@ trait HasToArray
                 } else {
                     $params[$name] = (array) $val;
                 }
-            } elseif ($type === 'int' && $val !== null) {
+            } elseif ($typeName === 'int' && $val !== null) {
                 $params[$name] = (int) $val;
-            } elseif ($type === 'float' && $val !== null) {
+            } elseif ($typeName === 'float' && $val !== null) {
                 $params[$name] = (float) $val;
-            } elseif ($type === 'double' && $val !== null) {
-                $params[$name] = (float) $val;
-            } elseif ($type === 'string' && $val !== null) {
+            } elseif ($typeName === 'string' && $val !== null) {
                 $params[$name] = (string) $val;
-            } elseif ($type === 'bool' && $val !== null) {
+            } elseif ($typeName === 'bool' && $val !== null) {
                 $params[$name] = (bool) $val;
             } else {
                 $params[$name] = $val;
@@ -112,15 +111,13 @@ trait HasToArray
         $object = new static(...$params);
 
         if (isset($data['id'])) {
-            $reflection = new \ReflectionClass(static::class);
             $idProperty = $reflection->getProperty('id');
-            $type = $idProperty->getType();
-
+            $idType = $idProperty->getType();
             $value = $data['id'];
 
-            if ($type && $type->getName() === 'int') {
+            if ($idType instanceof \ReflectionNamedType && $idType->getName() === 'int') {
                 $value = (int) $value;
-            } elseif ($type && $type->getName() === 'string') {
+            } elseif ($idType instanceof \ReflectionNamedType && $idType->getName() === 'string') {
                 $value = (string) $value;
             }
             $idProperty->setValue($object, $value);

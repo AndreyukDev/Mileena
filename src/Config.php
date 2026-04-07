@@ -16,25 +16,22 @@ class Config
     {
         $this->projectRoot = rtrim($projectRoot, '/\\');
 
-        // 1. Сначала грузим .env приложения (если он есть)
+        // load .env if exists
         if (file_exists($projectRoot . '/.env')) {
             Dotenv::createImmutable($projectRoot)->safeLoad();
         }
 
-        // 2. Слой 1: Дефолты фреймворка (Mileena)
-        // Предполагаем структуру vendor/mileena/core/config/
+        //   vendor/mileena/core/config/
         $mileenaConfigPath = dirname(__DIR__) . '/config';
         $this->loadFromDir($mileenaConfigPath);
 
-        // 3. Слой 2: Конфиги приложения (App)
-        // Они перекрывают дефолты Mileena
+        // app config overides mileena
         $appConfigPath  = $projectRoot . '/config';
 
         if (is_dir($appConfigPath)) {
             $this->loadFromDir($appConfigPath);
 
-            // 4. Слой 3: Конфиги окружения (Prod/Test)
-            // Если в .env указано APP_ENV=test, догружаем из /app/config/test/
+            // prod/test env
             $env = $_ENV['APP_ENV'] ?? 'dev';
             $envPath = $appConfigPath . '/' . $env;
 
@@ -50,8 +47,6 @@ class Config
             $key = basename($file, '.php');
             $newSettings = require $file;
 
-            // Рекурсивно сливаем массивы, чтобы можно было
-            // переопределить только один ключ в большом конфиге
             if (is_array($newSettings)) {
                 $this->settings[$key] = array_replace_recursive(
                     $this->settings[$key] ?? [],
@@ -66,7 +61,6 @@ class Config
         $parts = explode('.', $key);
         $value = $this->settings;
 
-        //        print_r($value);
         foreach ($parts as $part) {
             if (!is_array($value) || !isset($value[$part])) {
                 $envKey = strtoupper(str_replace('.', '_', $key));
