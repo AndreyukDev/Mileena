@@ -73,13 +73,11 @@ class Params
      * @param string|int|null $second The secondary key for nested arrays.
      * @return int|null Returns the integer value, or null if the parameter is not set or empty.
      */
-    public function getInt(string $name, int|string|null $second = null): ?int
+    public function getInt(string $name, int|string|null $second = null, int|string|null $third = null): ?int
     {
-        $val = ($second !== null)
-            ? ($this->source[$name][$second] ?? '')
-            : ($this->source[$name] ?? '');
+        $val = $this->fetch($name, $second, $third);
 
-        return $val === '' ? null : (int) $val;
+        return ($val === null || $val === '') ? null : (int) $val;
     }
 
     /**
@@ -89,9 +87,9 @@ class Params
      * @param string|int|null $second The secondary key for nested arrays.
      * @return int Returns the integer value, or 0 if the parameter is not set or empty.
      */
-    public function getIntval(string $name, int|string|null $second = null): int
+    public function getIntval(string $name, int|string|null $second = null, int|string|null $third = null): int
     {
-        return $this->getInt($name, $second) ?? 0;
+        return $this->getInt($name, $second, $third) ?? 0;
     }
 
     /**
@@ -115,9 +113,9 @@ class Params
      * @param string $name The primary key of the parameter.
      * @return string Returns the string value, or an empty string if not set.
      */
-    public function getStrval(string $name): string
+    public function getStrval(string $name, int|string|null $second = null, int|string|null $third = null): string
     {
-        return (string) ($this->source[$name] ?? '');
+        return (string) ($this->getString($name, $second, $third) ?? '');
     }
 
     /**
