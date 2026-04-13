@@ -184,11 +184,11 @@ class Params
     public function is(string $name, int|string|null $second = null, int|string|null $third = null): bool
     {
         if ($third !== null) {
-            return isset($this->source[$name][$second][$third]);
+            return is_array($this->source[$name][$second]) && isset($this->source[$name][$second][$third]);
         }
 
         if ($second !== null) {
-            return isset($this->source[$name][$second]);
+            return is_array($this->source[$name]) && isset($this->source[$name][$second]);
         }
 
         return isset($this->source[$name]);
@@ -262,11 +262,19 @@ class Params
     private function fetch(string $name, int|string|null $second = null, int|string|null $third = null): mixed
     {
         if ($third !== null) {
-            return $this->source[$name][$second][$third] ?? null;
+            if (is_array($this->source[$name][$second])) {
+                return $this->source[$name][$second][$third] ?? null;
+            } else {
+                return null;
+            }
         }
 
         if ($second !== null) {
-            return $this->source[$name][$second] ?? null;
+            if (is_array($this->source[$name])) {
+                return $this->source[$name][$second] ?? null;
+            } else {
+                return null;
+            }
         }
 
         return $this->source[$name] ?? null;
