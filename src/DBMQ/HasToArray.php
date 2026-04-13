@@ -41,6 +41,9 @@ trait HasToArray
                 $data[$k] = json_encode($v);
             } elseif (is_object($v) && method_exists($v, 'toArray')) {
                 $data[$k] = $v->toArray();
+            } elseif ($v instanceof \UnitEnum) {
+                // suppoert enum (backed и pure)
+                $data[$k] = $v instanceof \BackedEnum ? $v->value : $v->name;
             }
         }
 
@@ -80,13 +83,31 @@ trait HasToArray
             $val = $camelData[$name] ?? null;
 
             $typeName = null;
+            $isEnum = false;
+            $enumType = null;
 
             if ($type instanceof \ReflectionNamedType) {
                 $typeName = $type->getName();
+                $isEnum = enum_exists($typeName);
+
+                if ($isEnum) {
+                    $enumType = $typeName;
+                }
             }
 
-            if ($typeName === \DateTime::class && is_string($val) && !empty($val)) {
+            if ($isEnum && $val !== null) {
+                $enumClass = $enumType;
+                $params[$name] = $enumClass::tryFrom($val);
+
+                if ($params[$name] === null) {
+                    throw new \InvalidArgumentException(
+                        sprintf('Invalid value "%s" for enum %s::%s', $val, $enumClass, $name),
+                    );
+                }
+            } elseif ($typeName === \DateTime::class && is_string($val) && !empty($val)) {
                 $params[$name] = new \DateTime($val);
+            } elseif ($typeName === \DateTimeImmutable::class && is_string($val) && !empty($val)) {
+                $params[$name] = new \DateTimeImmutable($val);
             } elseif ($typeName === 'array') {
                 if (is_string($val) && !empty($val)) {
                     $params[$name] = json_decode($val, true) ?: [];
