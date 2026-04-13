@@ -1,10 +1,10 @@
 parameters:
 	ignoreErrors:
 		-
-			message: '#^Trait Mileena\\DBMQ\\HasToArray is used zero times and is not analysed\.$#'
-			identifier: trait.unused
+			message: '#^Call to an undefined static method UnitEnum\:\:tryFrom\(\)\.$#'
+			identifier: staticMethod.notFound
 			count: 1
-			path: src/DBMQ/HasToArray.php
+			path: src/DBMQ/AbstractDTO.php
 
 		-
 			message: '#^Trait Mileena\\DBMQ\\LegacyArrayAccess is used zero times and is not analysed\.$#'

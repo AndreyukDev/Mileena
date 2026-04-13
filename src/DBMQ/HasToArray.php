@@ -42,7 +42,7 @@ trait HasToArray
             } elseif (is_object($v) && method_exists($v, 'toArray')) {
                 $data[$k] = $v->toArray();
             } elseif ($v instanceof \UnitEnum) {
-                // suppoert enum (backed и pure)
+                // support enum (backed и pure)
                 $data[$k] = $v instanceof \BackedEnum ? $v->value : $v->name;
             }
         }
