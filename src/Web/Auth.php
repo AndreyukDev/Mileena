@@ -67,9 +67,24 @@ abstract class Auth
     }
 
     /**
+     * Checks whether the currently authenticated user has a specific role.
+     *
+     * @param string $role The role identifier to check against the authenticated user's role.
+     * @return bool Returns true if the user is logged in and their role matches the given $role, false otherwise.
+     */
+    public static function checkRole(string $role): bool
+    {
+        if (!self::isLoggedIn()) {
+            return false;
+        }
+
+        return $_SESSION['auth']['role'] === $role;
+    }
+
+    /**
      * Establishes a user session upon successful login.
      *
-     * @param array{id: int, username: string, debug?: false, allow?: array}|array{} $user An associative array containing user data.
+     * @param array{id: int, username: string, role?: string, debug?: false, allow?: array}|array{} $user An associative array containing user data.
      * @return bool Always returns true on success.
      */
     public static function login(array $user): bool
@@ -84,6 +99,7 @@ abstract class Auth
         $_SESSION['auth'] = [
             'user_id' => (int) $user['id'],
             'username' => (string) $user['username'],
+            'role' => (string) (isset($user['role']) ? $user['role'] : 'member'),
             'debug' => (bool) ($user['debug'] ?? false),
             'allow' => (array) ($user['allow'] ?? []),
         ];
