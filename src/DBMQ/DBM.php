@@ -140,7 +140,16 @@ abstract class DBM
         $finalParams = [];
 
         if (!empty($params)) {
-            foreach ($params as $val) {
+            $posOffest = 0;
+
+            $posMap = [];
+
+            // get the index map of "?" for replace
+            foreach ($params as $index => $val) {
+                $posMap[$index] = self::getNthPos($q, '?', $index);
+            }
+
+            foreach ($params as $index => $val) {
                 if (is_array($val)) {
                     if (empty($val)) {
                         $placeholders = 'NULL';
@@ -149,10 +158,11 @@ abstract class DBM
                         $finalParams = array_merge($finalParams, array_values($val));
                     }
 
-                    $pos = strpos($q, '?');
+                    $pos = $posMap[$index];
 
                     if ($pos !== false) {
-                        $q = substr_replace($q, $placeholders, $pos, 1);
+                        $q = substr_replace($q, $placeholders, $pos + $posOffest, 1);
+                        $posOffest += strlen($placeholders) - 1;
                     }
                 } else {
                     $finalParams[] = $val;
@@ -163,7 +173,6 @@ abstract class DBM
         }
 
         self::$lastQuery = self::getDebugSql($q, $finalParams);
-        ;
 
         if (self::$showQuery) {
             echo self::$lastQuery;
@@ -218,6 +227,32 @@ abstract class DBM
         return self::$connection;
     }
 
+    /**
+     * Returns the position of the Nth occurrence of a substring (0-based indexing).
+     *
+     * @param string $haystack The string to search in.
+     * @param string $needle The substring to search for.
+     * @param int $n The occurrence number (0-based: 0 = first, 1 = second, etc.).
+     * @return int|false The position of the Nth occurrence, or false if not found.
+     */
+    private static function getNthPos(string $haystack, string $needle, int $n): false|int
+    {
+        if ($n < 0) {
+            return false;
+        }
+
+        $pos = -1;
+        for ($i = 0; $i <= $n; $i++) {
+            $pos = strpos($haystack, $needle, $pos + 1);
+
+            if ($pos === false) {
+                return false;
+            }
+        }
+
+        return $pos;
+    }
+
     private static function getDebugSql(string $sql, array $params): string
     {
         if (empty($params)) {
@@ -229,7 +264,9 @@ abstract class DBM
         foreach ($params as $value) {
             if (is_null($value)) {
                 $formatted = "NULL";
-            } elseif (is_numeric($value)) {
+            } elseif (is_int($value)) {
+                $formatted = $value;
+            } elseif (is_double($value)) {
                 $formatted = $value;
             } else {
                 $formatted = "'" . $con->real_escape_string((string) $value) . "'";
